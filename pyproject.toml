@@ -30,7 +30,7 @@ dev = [
 
 [tool.ruff]
 line-length = 79
-extend-exclude = ['migrations']
+extend-exclude = ['migrations','database']
 
 [tool.ruff.lint]
 preview = true

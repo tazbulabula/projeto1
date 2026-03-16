@@ -41,6 +41,8 @@ def _mock_deb_time(*, model, time=datetime(2025, 1, 1)):
     def fak_time_hook(mapper, connection, target):
         if hasattr(target, 'created_at'):
             target.created_at = time
+        if hasattr(target, 'updated_at'):
+            target.updated_at = time
 
     event.listen(model, 'before_insert', fak_time_hook)
     yield time
