@@ -11,6 +11,7 @@ from projeto1.models import User
 from projeto1.schemas import Token
 from projeto1.security import (
     create_access_token,
+    get_current_user,
     verify_password,
 )
 
@@ -18,6 +19,7 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 
 Session = Annotated[AsyncSession, Depends(get_session)]
 Oauth2Form = Annotated[OAuth2PasswordRequestForm, Depends()]
+CurrentUser = Annotated[User, Depends(get_current_user)]
 
 
 @router.post('/token', response_model=Token)
@@ -31,7 +33,8 @@ async def login_for_access_token(
 
     if not user:
         raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found.'
+            status_code=HTTPStatus.UNAUTHORIZED,
+            detail='Incorrect email or password.',
         )
 
     if not verify_password(form_data.password, user.password):
@@ -43,3 +46,10 @@ async def login_for_access_token(
     access_token = create_access_token(data={'sub': user.email})
 
     return {'access_token': access_token, 'token_type': 'bearer'}
+
+
+@router.post('/refresh_token', response_model=Token)
+async def refresh_access_token(user: CurrentUser):
+
+    new_access_token = create_access_token(data={'sub': user.email})
+    return {'access_token': new_access_token, 'token_type': 'bearer'}

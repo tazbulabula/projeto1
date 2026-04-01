@@ -35,3 +35,14 @@ def test_jwt_email_invalid(client):
 
     assert response.status_code == HTTPStatus.UNAUTHORIZED
     assert response.json() == {'detail': 'Could not validate credentials'}
+
+
+def test_jwt_email_inexistent(client):
+    token = create_access_token(data={'sub': 'example@gmail.com'})
+
+    response = client.delete(
+        '/users/{user_id}', headers={'Authorization': f'Bearer {token}'}
+    )
+
+    assert response.status_code == HTTPStatus.UNAUTHORIZED
+    assert response.json() == {'detail': 'Could not validate credentials'}
