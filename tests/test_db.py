@@ -27,16 +27,17 @@ async def test_create_user(session, mock_db_time):
 
 
 @pytest.mark.asyncio
-async def test_create_todo(session, user):
-    todo = Todo(
-        title='Dormir',
-        description='Dormir mais cedo.',
-        state='draft',
-        user_id=user.id,
-    )
+async def test_create_todo(session, user, mock_db_time):
+    with mock_db_time(model=Todo) as time:
+        todo = Todo(
+            title='Dormir',
+            description='Dormir mais cedo.',
+            state='draft',
+            user_id=user.id,
+        )
 
-    session.add(todo)
-    await session.commit()
+        session.add(todo)
+        await session.commit()
 
     todo = await session.scalar(select(Todo))
 
@@ -46,6 +47,8 @@ async def test_create_todo(session, user):
         'description': 'Dormir mais cedo.',
         'state': 'draft',
         'user_id': 1,
+        'created_at': time,
+        'updated_at': time,
     }
 
 

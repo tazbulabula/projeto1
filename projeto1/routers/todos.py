@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from typing import Annotated
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,7 +36,7 @@ async def create_todo(user: CurrentUser, todo: TodoSchema, session: Session):
     await session.commit()
     await session.refresh(todo)
 
-    return todo
+    return jsonable_encoder(todo)
 
 
 @router.get('/', response_model=TodoList)
